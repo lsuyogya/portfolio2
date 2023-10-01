@@ -11,13 +11,13 @@ const Wobbler = ({ txt }: { txt: string }) => {
 	return (
 		<div className='text-9xl' ref={wobRef}>
 			{textArray.map((x, idx) => {
-				let delay = (idx + 1) * 50;
+				const delay = (idx + 1) * 50;
 				return (
 					<span
 						className='wobbleAnimation'
 						style={{ animationDelay: `${delay}ms` }}
 						key={x + idx}>
-						{x}
+						{x === ' ' ? '\u00A0' : x}
 					</span>
 				);
 			})}
