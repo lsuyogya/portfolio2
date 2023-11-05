@@ -6,7 +6,6 @@ import { useRef } from 'react';
 const Wobbler = ({ txt }: { txt: string }) => {
 	const wobRef = useRef<HTMLDivElement>(null);
 	const textArray = txt.split('');
-	console.log(textArray);
 
 	return (
 		<div className='text-9xl' ref={wobRef}>
