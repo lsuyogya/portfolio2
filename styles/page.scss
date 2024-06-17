@@ -1,4 +1,29 @@
-
-.scrollArrow{
-    transition: scale 200ms ease-in-out;
+.scrollArrow {
+  transition: scale 200ms ease-in-out;
+}
+.bg-dark {
+  background-color: #000;
+}
+.chessboard {
+  display: grid;
+  max-width: fit-content;
+  grid-template-columns: repeat(
+    var(--boardColumns, 4),
+    calc(80vh / var(--boardColumns, 4))
+  );
+  grid-template-rows: repeat(
+    var(--boardColumns, 4),
+    calc(80vh / var(--boardColumns, 4))
+  );
+  place-content: center;
+  transform: perspective(60rem) rotateX(45deg) rotateZ(25deg) translateZ(-100px);
+  //   div {
+  //     border:1px solid white;
+  //   }
+  .light {
+    background-color: #eee;
+  }
+  .dark {
+    background-color: #333;
+  }
 }
