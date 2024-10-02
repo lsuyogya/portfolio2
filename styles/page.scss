@@ -9,11 +9,11 @@
   max-width: fit-content;
   grid-template-columns: repeat(
     var(--boardColumns, 4),
-    calc(80vh / var(--boardColumns, 4))
+    calc(70vmin / var(--boardColumns, 4))
   );
   grid-template-rows: repeat(
     var(--boardColumns, 4),
-    calc(80vh / var(--boardColumns, 4))
+    calc(70vmin / var(--boardColumns, 4))
   );
   place-content: center;
   transform: perspective(60rem) rotateX(45deg) rotateZ(25deg) translateZ(-100px);

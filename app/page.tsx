@@ -1,46 +1,63 @@
-"use client";
-import Image from "next/image";
-import "@/styles/page.scss";
-import { Rubik_Moonrocks } from "next/font/google";
-import localFont from "next/font/local";
-import { motion } from "framer-motion";
-import { useState, useEffect, useRef, createElement } from "react";
+'use client';
+import Image from 'next/image';
+import '@/styles/page.scss';
+import { Rubik_Moonrocks } from 'next/font/google';
+import localFont from 'next/font/local';
+import { motion } from 'framer-motion';
+import { useState, useEffect, useRef, createElement, useCallback } from 'react';
 
-const pixel = Rubik_Moonrocks({ weight: "400", subsets: ["latin"] });
+const pixel = Rubik_Moonrocks({ weight: '400', subsets: ['latin'] });
 const pixelify = localFont({
-  src: "../public/fonts/pixelify_sans/PixelifySans-VariableFont_wght.ttf",
+  src: '../public/fonts/pixelify_sans/PixelifySans-VariableFont_wght.ttf',
 });
+
+function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timer: ReturnType<typeof setTimeout>;
+  return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
+    clearTimeout(timer);
+    timer = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
 export default function Home() {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [windowHeight, setWindowHeight] = useState(0);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  function handleScroll() {
+  const handleScroll = useCallback(() => {
     const position = window.scrollY;
     setScrollPosition(position);
-  }
-  function handleWindowSize() {
+  }, []);
+  const handleWindowSize = useCallback(() => {
     const height = window.innerHeight;
     setWindowHeight(height);
-  }
-
+  }, []);
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleWindowSize, { passive: true });
+    // const debouncedScroll = debounce(handleScroll, 600);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('touchmove', handleScroll, { passive: true });
+    // window.addEventListener('scroll', debouncedScroll, { passive: true });
+    window.addEventListener('resize', handleWindowSize, { passive: true });
     handleWindowSize();
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.addEventListener("resize", handleWindowSize);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('touchmove', handleScroll);
+      // window.removeEventListener('scroll', debouncedScroll);
+      window.addEventListener('resize', handleWindowSize);
     };
-  }, []);
+  }, [handleScroll, handleWindowSize]);
 
-  const scrollBasedImgScale = scrollPosition / windowHeight;
-  if (imgRef.current && scrollBasedImgScale) {
-    imgRef.current.style.scale = `${scrollBasedImgScale * 10000}`;
-    scrollBasedImgScale > 0
-      ? (imgRef.current.style.scale = `${scrollBasedImgScale * 1000}`)
-      : (imgRef.current.style.scale = `1`);
-  }
+  // const scrollBasedImgScale = Math.min(scrollPosition / windowHeight, 1);
+  // console.log(scrollBasedImgScale);
+  // if (imgRef.current && scrollBasedImgScale) {
+  //   imgRef.current.style.scale = `${scrollBasedImgScale * 10000}`;
+  //   scrollBasedImgScale > 0
+  //     ? (imgRef.current.style.scale = `${scrollBasedImgScale * 1000}`)
+  //     : (imgRef.current.style.scale = `1`);
+  // }
   const chessColumns = 4;
   let chessBoardArray = [];
   for (let i = 1; i <= chessColumns; i++) {
@@ -51,8 +68,7 @@ export default function Home() {
           key={`${i}-${j}`}
           data-row={i}
           data-column={j}
-          className={isDark ? "dark" : "light"}
-        ></div>
+          className={isDark ? 'dark' : 'light'}></div>
       );
     }
   }
@@ -65,14 +81,16 @@ export default function Home() {
         </div>
         <motion.div
           animate={{ y: [0, 20, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-        >
+          transition={{ repeat: Infinity, duration: 2 }}>
           <Image
-            src={"/scroll-down-arrow.svg"}
+            src={'/scroll-down-arrow.svg'}
             alt="scroll arrow"
             width={100}
             height={100}
             ref={imgRef}
+            style={{
+              scale: Math.max(scrollPosition / windowHeight, 0.001) * 1000,
+            }}
             className="m-auto mt-4 scrollArrow"
           />
         </motion.div>
@@ -80,8 +98,7 @@ export default function Home() {
       <section className="min-h-screen bg-dark grid place-content-center">
         <div
           className="chessboard"
-          style={{ "--boardColumns": chessColumns } as React.CSSProperties}
-        >
+          style={{ '--boardColumns': chessColumns } as React.CSSProperties}>
           {chessBoardArray}
         </div>
       </section>
