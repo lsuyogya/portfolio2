@@ -50,41 +50,76 @@ export default function Home() {
     };
   }, [handleScroll, handleWindowSize]);
 
-  // const scrollBasedImgScale = Math.min(scrollPosition / windowHeight, 1);
-  // console.log(scrollBasedImgScale);
-  // if (imgRef.current && scrollBasedImgScale) {
-  //   imgRef.current.style.scale = `${scrollBasedImgScale * 10000}`;
-  //   scrollBasedImgScale > 0
-  //     ? (imgRef.current.style.scale = `${scrollBasedImgScale * 1000}`)
-  //     : (imgRef.current.style.scale = `1`);
-  // }
-  const chessColumns = 4;
+  const boardSections = [
+    {
+      id: 'education',
+      imgUrl: 'icons/school-science-graduation-cap.svg',
+      label: 'Education',
+    },
+    {
+      id: 'work',
+      imgUrl: 'icons/consultancyContent.svg',
+      label: 'Work',
+    },
+    {
+      id: 'projects',
+      imgUrl: 'icons/coding-apps-websites-mobile.svg',
+      label: 'Projects',
+    },
+    {
+      id: 'blog',
+      imgUrl: 'icons/content-files-write-note.svg',
+      label: 'Blog',
+    },
+    {
+      id: 'Skillset',
+      imgUrl: 'icons/coding-apps-websites-programming-hold-code.svg',
+      label: 'Blog',
+    },
+  ];
+  function* sectionGenerator(
+    sections: { id: string; imgUrl: string; label: string }[]
+  ) {
+    for (let section of sections) {
+      yield section;
+    }
+  }
+  // Using the generator
+  const generator = sectionGenerator(boardSections);
+
+  const chessColumns = 3;
   let chessBoardArray = [];
   for (let i = 1; i <= chessColumns; i++) {
     for (let j = 1; j <= chessColumns; j++) {
       const isDark = (i + j) % 2 === 1;
+      let value = null;
+      if (!isDark) {
+        value = generator.next().value;
+      }
       chessBoardArray.push(
         <div
           key={`${i}-${j}`}
           data-row={i}
           data-column={j}
           className={`${isDark ? 'dark' : 'light'} cell`}>
-          <div className="imgWrapper">
-            <Image
-              src={'/icons/business-product-target.svg'}
-              height={200}
-              width={200}
-              alt=""
-              className="original"
-            />
-            <Image
-              src={'/icons/business-product-target.svg'}
-              height={200}
-              width={200}
-              alt=""
-              className="reflection"
-            />
-          </div>
+          {value ? (
+            <div className="imgWrapper">
+              <Image
+                src={value.imgUrl}
+                height={200}
+                width={200}
+                alt=""
+                className="original"
+              />
+              <Image
+                src={value.imgUrl}
+                height={200}
+                width={200}
+                alt=""
+                className="reflection"
+              />
+            </div>
+          ) : null}
         </div>
       );
     }
