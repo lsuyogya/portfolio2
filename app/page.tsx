@@ -68,7 +68,24 @@ export default function Home() {
           key={`${i}-${j}`}
           data-row={i}
           data-column={j}
-          className={isDark ? 'dark' : 'light'}></div>
+          className={`${isDark ? 'dark' : 'light'} cell`}>
+          <div className="imgWrapper">
+            <Image
+              src={'/icons/business-product-target.svg'}
+              height={200}
+              width={200}
+              alt=""
+              className="original"
+            />
+            <Image
+              src={'/icons/business-product-target.svg'}
+              height={200}
+              width={200}
+              alt=""
+              className="reflection"
+            />
+          </div>
+        </div>
       );
     }
   }
@@ -89,17 +106,17 @@ export default function Home() {
             height={100}
             ref={imgRef}
             style={{
-              scale: Math.max(scrollPosition / windowHeight, 0.001) * 1000,
+              scale: Math.max(scrollPosition / windowHeight, 0.001) * 1000 ?? 1,
             }}
             className="m-auto mt-4 scrollArrow"
           />
         </motion.div>
       </section>
-      <section className="min-h-screen bg-dark grid place-content-center">
+      <section className="min-h-screen bg-dark grid place-content-center content-start">
         <div
           className="chessboard"
           style={{ '--boardColumns': chessColumns } as React.CSSProperties}>
-          {chessBoardArray}
+          <div className="contents">{chessBoardArray}</div>
         </div>
       </section>
     </main>
