@@ -49,6 +49,10 @@
           rgba(0, 0, 0, 0.01) 80%,
           rgba(0, 0, 0, 0.01)
         );
+        transform: perspective(8rem) rotatey(calc(var(--rotate) * 1))
+          rotateX(var(--rotate));
+        margin-left: -10%;
+        margin-top: -5%;
       }
     }
     &:hover img {
