@@ -1,84 +1,121 @@
-'use client';
-import Image from 'next/image';
-import '@/styles/page.scss';
-import { Rubik_Moonrocks } from 'next/font/google';
-import localFont from 'next/font/local';
-import { motion } from 'framer-motion';
-import { useState, useEffect, useRef, createElement, useCallback } from 'react';
+"use client";
+import Image from "next/image";
+import "@/styles/page.scss";
+import { Rubik_Moonrocks } from "next/font/google";
+import localFont from "next/font/local";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useMemo, useRef, useState } from "react";
+import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
 
-const pixel = Rubik_Moonrocks({ weight: '400', subsets: ['latin'] });
+const pixel = Rubik_Moonrocks({ weight: "400", subsets: ["latin"] });
 const pixelify = localFont({
-  src: '../public/fonts/pixelify_sans/PixelifySans-VariableFont_wght.ttf',
+  src: "../public/fonts/pixelify_sans/PixelifySans-VariableFont_wght.ttf",
 });
 
-function debounce<T extends (...args: any[]) => void>(
-  func: T,
-  delay: number
-): (...args: Parameters<T>) => void {
-  let timer: ReturnType<typeof setTimeout>;
-  return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
-    clearTimeout(timer);
-    timer = setTimeout(() => func.apply(this, args), delay);
-  };
-}
+gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
+const boardSections = [
+  {
+    id: "education",
+    imgUrl: "icons/school-science-graduation-cap.svg",
+    label: "Education",
+  },
+  {
+    id: "work",
+    imgUrl: "icons/consultancyContent.svg",
+    label: "Work",
+  },
+  {
+    id: "projects",
+    imgUrl: "icons/coding-apps-websites-mobile.svg",
+    label: "Projects",
+  },
+  {
+    id: "blog",
+    imgUrl: "icons/content-files-write-note.svg",
+    label: "Blog",
+  },
+  {
+    id: "Skillset",
+    imgUrl: "icons/coding-apps-websites-programming-hold-code.svg",
+    label: "Skillset",
+  },
+];
 
 export default function Home() {
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const [windowHeight, setWindowHeight] = useState(0);
-  const imgRef = useRef<HTMLImageElement>(null);
+  const [menuTxt, setMenuTxt] = useState("Menu");
+  const arrowRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const menuTxtRef = useRef<HTMLHeadingElement>(null);
 
-  const handleScroll = useCallback(() => {
-    const position = window.scrollY;
-    setScrollPosition(position);
-  }, []);
-  const handleWindowSize = useCallback(() => {
-    const height = window.innerHeight;
-    setWindowHeight(height);
-  }, []);
-  useEffect(() => {
-    // const debouncedScroll = debounce(handleScroll, 600);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('touchmove', handleScroll, { passive: true });
-    // window.addEventListener('scroll', debouncedScroll, { passive: true });
-    window.addEventListener('resize', handleWindowSize, { passive: true });
-    handleWindowSize();
+  useGSAP(
+    () => {
+      if (!arrowRef.current || !containerRef.current) return;
+
+      // 🔁 Bounce animation for arrow
+      const bounce = gsap.to(arrowRef.current, {
+        y: 20,
+        duration: 1,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut",
+      });
+
+      // 📏 Scale arrow as we scroll
+      const scaleArrowTween = gsap.fromTo(
+        arrowRef.current,
+        { scale: 1, translateX: "0" },
+        {
+          scale: 200, // adjust as needed
+          translateX: "-100%",
+          ease: "none",
+          scrollTrigger: {
+            trigger: containerRef.current, // pin the whole section
+            start: "top top", // start when section top hits viewport top
+            end: "+=1000", // scroll distance
+            scrub: 1,
+            pin: true, // 🔥 pins the section
+            anticipatePin: 1,
+            onUpdate: (self) => {
+              // self.progress is 0 → 1 over the scroll
+              if (self.progress > 0.2) {
+                bounce.pause(); // only pause once scroll starts changing scale
+              } else {
+                bounce.resume(); // resume bounce when at start
+              }
+            },
+          },
+        },
+      );
+
+      return () => {
+        bounce.kill();
+        scaleArrowTween.scrollTrigger?.kill();
+        scaleArrowTween.kill();
+      };
+    },
+    { scope: containerRef },
+  );
+
+  // 👇 runs every time `text` changes
+  useGSAP(() => {
+    if (!menuTxtRef.current) return;
+    const scrambleTextTween = gsap.to(menuTxtRef.current, {
+      duration: 1.4,
+      scrambleText: {
+        text: menuTxt,
+        chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      },
+      ease: "power2.out",
+    });
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('touchmove', handleScroll);
-      // window.removeEventListener('scroll', debouncedScroll);
-      window.addEventListener('resize', handleWindowSize);
+      scrambleTextTween.kill();
     };
-  }, [handleScroll, handleWindowSize]);
+  }, [menuTxt]); // 🔑 dependency triggers animation
 
-  const boardSections = [
-    {
-      id: 'education',
-      imgUrl: 'icons/school-science-graduation-cap.svg',
-      label: 'Education',
-    },
-    {
-      id: 'work',
-      imgUrl: 'icons/consultancyContent.svg',
-      label: 'Work',
-    },
-    {
-      id: 'projects',
-      imgUrl: 'icons/coding-apps-websites-mobile.svg',
-      label: 'Projects',
-    },
-    {
-      id: 'blog',
-      imgUrl: 'icons/content-files-write-note.svg',
-      label: 'Blog',
-    },
-    {
-      id: 'Skillset',
-      imgUrl: 'icons/coding-apps-websites-programming-hold-code.svg',
-      label: 'Blog',
-    },
-  ];
   function* sectionGenerator(
-    sections: { id: string; imgUrl: string; label: string }[]
+    sections: { id: string; imgUrl: string; label: string }[],
   ) {
     for (let section of sections) {
       yield section;
@@ -89,6 +126,7 @@ export default function Home() {
 
   const chessColumns = 3;
   let chessBoardArray = [];
+
   for (let i = 1; i <= chessColumns; i++) {
     for (let j = 1; j <= chessColumns; j++) {
       const isDark = (i + j) % 2 === 1;
@@ -101,14 +139,24 @@ export default function Home() {
           key={`${i}-${j}`}
           data-row={i}
           data-column={j}
-          className={`${isDark ? 'dark' : 'light'} cell`}>
+          className={`${isDark ? "dark" : "light"} cell`}
+        >
           {value ? (
-            <div className="imgWrapper">
+            <div
+              className="imgWrapper"
+              title={value.label}
+              onMouseEnter={() => {
+                setTimeout(() => setMenuTxt(value.label), 100);
+              }}
+              onMouseLeave={() => {
+                setTimeout(() => setMenuTxt("Menu"), 50);
+              }}
+            >
               <Image
                 src={value.imgUrl}
                 height={200}
                 width={200}
-                alt=""
+                alt={`${value.label} - icon`}
                 className="original"
               />
               <Image
@@ -116,42 +164,54 @@ export default function Home() {
                 height={200}
                 width={200}
                 alt=""
+                aria-hidden="true"
                 className="reflection"
               />
             </div>
           ) : null}
-        </div>
+        </div>,
       );
     }
   }
   return (
     <main>
-      <section className="grid place-content-center min-h-[120vh] overflow-hidden">
-        <div className={`text-9xl ${pixel.className} `}>WELCOME</div>
-        <div className={`text-2xl ${pixelify.className} text-center `}>
+      {/* Welcome Section */}
+      <section
+        className="grid place-content-center text-center min-h-[100vh] overflow-hidden"
+        ref={containerRef}
+      >
+        <h1 className={`text-5xl md:text-9xl ${pixel.className} `}>WELCOME</h1>
+        <h2
+          className={`text-xl md:text-2xl ${pixelify.className} text-center `}
+        >
           Scroll down to know more about me
-        </div>
-        <motion.div
-          animate={{ y: [0, 20, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}>
+        </h2>
+        <div ref={arrowRef}>
           <Image
-            src={'/scroll-down-arrow.svg'}
+            src={"/scroll-down-arrow.svg"}
             alt="scroll arrow"
             width={100}
             height={100}
-            ref={imgRef}
-            style={{
-              scale: Math.max(scrollPosition / windowHeight, 0.001) * 1000 ?? 1,
-            }}
             className="m-auto mt-4 scrollArrow"
           />
-        </motion.div>
+        </div>
       </section>
-      <section className="min-h-screen bg-dark grid place-content-center content-start">
-        <div
-          className="chessboard"
-          style={{ '--boardColumns': chessColumns } as React.CSSProperties}>
-          <div className="contents">{chessBoardArray}</div>
+
+      {/* Menu Section */}
+      <section className="min-h-screen bg-dark w-full">
+        <div className="container grid place-content-center content-start mx-auto py-12">
+          <div
+            className={`header flex gap-[0.5ch] place-content-center ${pixelify.className} text-3xl md:text-5xl text-white text-center`}
+          >
+            <h1 ref={menuTxtRef}>{menuTxt}</h1>
+            <span className={"cursor"}>_</span>
+          </div>
+          <div
+            className="chessboard"
+            style={{ "--boardColumns": chessColumns } as React.CSSProperties}
+          >
+            <div className="contents">{chessBoardArray}</div>
+          </div>
         </div>
       </section>
     </main>

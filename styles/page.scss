@@ -16,6 +16,10 @@
     calc(70vmin / var(--boardColumns, 4))
   );
   place-content: center;
+  outline: 3px solid #555;
+  box-shadow:
+    4px 4px 0 #000,
+    8px 8px 0 #333; // hard stacked shadow
   transform: perspective(60rem) rotateX(45deg) rotateZ(25deg) translateZ(-100px);
   //   div {
   //     border:1px solid white;
@@ -23,19 +27,23 @@
   .cell {
     overflow: hidden;
     .imgWrapper {
-      perspective-origin: right;
-      --rotate: -40deg;
+      perspective-origin: left;
+      --rotate: -20deg;
       display: grid;
       place-items: center;
       position: relative;
       height: 100%;
       width: 100%;
+      cursor: pointer;
     }
     img {
       height: auto;
       width: clamp(0.25rem, 100%, 5rem);
       display: block;
-      transition: margin-left 600ms, margin-top 600ms, transform 600ms;
+      transition:
+        margin-left 600ms,
+        margin-top 600ms,
+        transform 600ms;
       &.reflection {
         position: absolute;
         top: 50%;
@@ -45,11 +53,11 @@
         translate: -25% 45%;
         // translate: 80% 120%;
         // TODO: FIND A BETTER WAY TO FLIP REFLECTION
-        scale: 0.9 -0.9;
+        scale: 0.8 -0.8;
         transition: opacity 400ms 200ms;
         mask-image: linear-gradient(
           to top,
-          rgba(0, 0, 0, 1),
+          rgba(0, 0, 0, 0.8),
           rgba(0, 0, 0, 0.7) 20%,
           rgba(0, 0, 0, 0.01) 80%,
           rgba(0, 0, 0, 0.01)
@@ -72,10 +80,38 @@
       //   linear-gradient(transparent, rgba(0, 0, 0, 0.5));
     }
     &.light {
-      background-color: #eee;
+      background-color: #f0ece0;
+      box-shadow:
+        inset 2px 2px 0 #fff,
+        // top-left highlight
+        inset -2px -2px 0 #b0a890; // bottom-right shadow
     }
     &.dark {
-      background-color: #333;
+      background-color: #2a2a2a;
+      box-shadow:
+        inset 2px 2px 0 #3d3d3d,
+        inset -2px -2px 0 #111;
     }
+  }
+  :has(.cell:hover) {
+    .cell {
+      filter: brightness(0.8);
+    }
+    .cell:hover {
+      filter: brightness(1);
+    }
+  }
+}
+
+.cursor {
+  animation: blink 1.2s step-end infinite;
+}
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
   }
 }
