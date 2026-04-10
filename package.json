@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
-    "framer-motion": "^10.16.4",
+    "@tailwindcss/postcss": "^4.2.2",
     "gsap": "^3.14.2",
     "next": "16.2.3",
     "react": "19.2.5",
@@ -21,11 +21,11 @@
     "@types/node": "latest",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "autoprefixer": "latest",
-    "eslint": "latest",
+    "autoprefixer": "^10.4.27",
+    "eslint": "^9.39.4",
     "eslint-config-next": "16.2.3",
     "postcss": "latest",
-    "tailwindcss": "latest",
+    "tailwindcss": "^4.2.2",
     "typescript": "latest"
   },
   "overrides": {
