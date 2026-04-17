@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
-:root {
-  --foreground-rgb: 12, 12, 12;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+@theme {
+  --font-pixel: var(--font-pixel);
+  --font-pixelify: var(--font-pixelify);
+  --font-pixelOperator: var(--font-pixelOperator);
+}
+
+.container {
+  @apply px-4;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  min-height: 100svh;
+  font-size: calc(18rem / 16);
+  font-family: var(--font-pixelOperator);
 }

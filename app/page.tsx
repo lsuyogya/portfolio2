@@ -1,18 +1,12 @@
 "use client";
 import Image from "next/image";
 import "@/styles/page.scss";
-import { Rubik_Moonrocks } from "next/font/google";
-import localFont from "next/font/local";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useMemo, useRef, useState } from "react";
 import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
-
-const pixel = Rubik_Moonrocks({ weight: "400", subsets: ["latin"] });
-const pixelify = localFont({
-  src: "../public/fonts/pixelify_sans/PixelifySans-VariableFont_wght.ttf",
-});
+import Link from "next/link";
 
 gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
 const boardSections = [
@@ -20,26 +14,31 @@ const boardSections = [
     id: "education",
     imgUrl: "icons/school-science-graduation-cap.svg",
     label: "Education",
+    link: "/education",
   },
   {
     id: "work",
     imgUrl: "icons/consultancyContent.svg",
     label: "Work",
+    link: "/work",
   },
   {
     id: "projects",
     imgUrl: "icons/coding-apps-websites-mobile.svg",
     label: "Projects",
+    link: "/projects",
   },
   {
     id: "blog",
     imgUrl: "icons/content-files-write-note.svg",
     label: "Blog",
+    link: "/blog",
   },
   {
     id: "Skillset",
     imgUrl: "icons/coding-apps-websites-programming-hold-code.svg",
     label: "Skillset",
+    link: "/skillset",
   },
 ];
 
@@ -115,7 +114,7 @@ export default function Home() {
   }, [menuTxt]); // 🔑 dependency triggers animation
 
   function* sectionGenerator(
-    sections: { id: string; imgUrl: string; label: string }[],
+    sections: { id: string; imgUrl: string; label: string; link: string }[],
   ) {
     for (let section of sections) {
       yield section;
@@ -142,32 +141,34 @@ export default function Home() {
           className={`${isDark ? "dark" : "light"} cell`}
         >
           {value ? (
-            <div
-              className="imgWrapper"
-              title={value.label}
-              onMouseEnter={() => {
-                setTimeout(() => setMenuTxt(value.label), 100);
-              }}
-              onMouseLeave={() => {
-                setTimeout(() => setMenuTxt("Menu"), 50);
-              }}
-            >
-              <Image
-                src={value.imgUrl}
-                height={200}
-                width={200}
-                alt={`${value.label} - icon`}
-                className="original"
-              />
-              <Image
-                src={value.imgUrl}
-                height={200}
-                width={200}
-                alt=""
-                aria-hidden="true"
-                className="reflection"
-              />
-            </div>
+            <Link href={value.link} className="w-full h-full block">
+              <div
+                className="imgWrapper"
+                title={value.label}
+                onMouseEnter={() => {
+                  setTimeout(() => setMenuTxt(value.label), 100);
+                }}
+                onMouseLeave={() => {
+                  setTimeout(() => setMenuTxt("Menu"), 50);
+                }}
+              >
+                <Image
+                  src={value.imgUrl}
+                  height={200}
+                  width={200}
+                  alt={`${value.label} - icon`}
+                  className="original"
+                />
+                <Image
+                  src={value.imgUrl}
+                  height={200}
+                  width={200}
+                  alt=""
+                  aria-hidden="true"
+                  className="reflection"
+                />
+              </div>
+            </Link>
           ) : null}
         </div>,
       );
@@ -180,10 +181,8 @@ export default function Home() {
         className="grid place-content-center text-center min-h-[100vh] overflow-hidden"
         ref={containerRef}
       >
-        <h1 className={`text-5xl md:text-9xl ${pixel.className} `}>WELCOME</h1>
-        <h2
-          className={`text-xl md:text-2xl ${pixelify.className} text-center `}
-        >
+        <h1 className={`text-5xl md:text-9xl font-pixel `}>WELCOME</h1>
+        <h2 className={`text-xl md:text-2xl font-pixelify text-center `}>
           Scroll down to know more about me
         </h2>
         <div ref={arrowRef}>
@@ -201,7 +200,7 @@ export default function Home() {
       <section className="min-h-screen bg-dark w-full">
         <div className="container grid place-content-center content-start mx-auto py-12">
           <div
-            className={`header flex gap-[0.5ch] place-content-center ${pixelify.className} text-3xl md:text-5xl text-white text-center`}
+            className={`header flex gap-[0.5ch] place-content-center text-3xl md:text-5xl text-white text-center`}
           >
             <h1 ref={menuTxtRef}>{menuTxt}</h1>
             <span className={"cursor"}>_</span>
