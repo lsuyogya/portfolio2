@@ -327,8 +327,6 @@ export default function SkillsGrid({ skills }: { skills: Skill[] }) {
       };
 
       const wrapperMouseLeave = () => {
-        if (leaveTimeout) clearTimeout(leaveTimeout);
-
         if (leaveTimeout) return;
 
         leaveTimeout = setTimeout(() => {
