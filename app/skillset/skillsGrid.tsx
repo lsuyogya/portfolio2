@@ -5,8 +5,9 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
 
+gsap.registerPlugin(ScrollTrigger);
+
 export default function SkillsGrid({ skills }: { skills: Skill[] }) {
-  gsap.registerPlugin(ScrollTrigger);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -16,6 +17,8 @@ export default function SkillsGrid({ skills }: { skills: Skill[] }) {
 
       const cards = gsap.utils.toArray(".card") as HTMLElement[];
       const wrapper = wrapperRef.current;
+      let leaveTimeout: ReturnType<typeof setTimeout> | null = null;
+      const leaveTimer = 150; // ms
 
       // -----------------------------
       // GLOBAL MOUSE POSITION
@@ -31,77 +34,137 @@ export default function SkillsGrid({ skills }: { skills: Skill[] }) {
       window.addEventListener("mousemove", handleMouseMoveGlobal);
 
       // -----------------------------
-      // RESET
+      // CARD HELPERS
       // -----------------------------
-      const resetAll = () => {
-        gsap.killTweensOf(cards);
+      const getParts = (c: HTMLElement) => ({
+        top: c.querySelector(".top"),
+        right: c.querySelector(".right"),
+        bottom: c.querySelector(".bottom"),
+        left: c.querySelector(".left"),
+      });
 
-        cards.forEach((c) => {
-          const top = c.querySelector(".top");
-          const right = c.querySelector(".right");
-          const bottom = c.querySelector(".bottom");
-          const left = c.querySelector(".left");
+      const resetCard = (c: HTMLElement) => {
+        const { top, right, bottom, left } = getParts(c);
 
-          gsap.to(c, {
-            scale: 1,
-            opacity: 1,
-            zIndex: 0,
-            duration: 0.2,
-          });
+        gsap.to(c, {
+          scale: 1,
+          opacity: 1,
+          zIndex: 0,
+          duration: 0.2,
+          overwrite: "auto",
+        });
 
-          gsap.to(top, { left: 24, right: 24, duration: 0.2 });
-          gsap.to(bottom, { left: 24, right: 24, duration: 0.2 });
-          gsap.to(left, { top: 24, bottom: 24, duration: 0.2 });
-          gsap.to(right, { top: 24, bottom: 24, duration: 0.2 });
+        gsap.to(top, { left: 24, right: 24, duration: 0.2, overwrite: "auto" });
+        gsap.to(bottom, {
+          left: 24,
+          right: 24,
+          duration: 0.2,
+          overwrite: "auto",
+        });
+        gsap.to(left, {
+          top: 24,
+          bottom: 24,
+          duration: 0.2,
+          overwrite: "auto",
+        });
+        gsap.to(right, {
+          top: 24,
+          bottom: 24,
+          duration: 0.2,
+          overwrite: "auto",
         });
       };
 
+      const activateCard = (c: HTMLElement) => {
+        const { top, right, bottom, left } = getParts(c);
+
+        gsap.to(c, {
+          scale: 1.02,
+          opacity: 1,
+          zIndex: 10,
+          duration: 0.2,
+          overwrite: "auto",
+        });
+
+        gsap.to(top, {
+          left: 36,
+          right: 36,
+          duration: 0.25,
+          overwrite: "auto",
+        });
+        gsap.to(bottom, {
+          left: 36,
+          right: 36,
+          duration: 0.25,
+          overwrite: "auto",
+        });
+        gsap.to(left, {
+          top: 36,
+          bottom: 36,
+          duration: 0.25,
+          overwrite: "auto",
+        });
+        gsap.to(right, {
+          top: 36,
+          bottom: 36,
+          duration: 0.25,
+          overwrite: "auto",
+        });
+      };
+
+      const dimCard = (c: HTMLElement) => {
+        const { top, right, bottom, left } = getParts(c);
+
+        gsap.to(c, {
+          opacity: 0.4,
+          scale: 0.98,
+          duration: 0.2,
+          overwrite: "auto",
+        });
+
+        gsap.to(top, { left: 0, right: 0, duration: 0.25, overwrite: "auto" });
+        gsap.to(bottom, {
+          left: 0,
+          right: 0,
+          duration: 0.25,
+          overwrite: "auto",
+        });
+        gsap.to(left, { top: 0, bottom: 0, duration: 0.25, overwrite: "auto" });
+        gsap.to(right, {
+          top: 0,
+          bottom: 0,
+          duration: 0.25,
+          overwrite: "auto",
+        });
+      };
+
+      const resetAll = () => {
+        cards.forEach(resetCard);
+      };
+
       // -----------------------------
-      // APPLY HOVER
+      // APPLY HOVER (STATE DIFF)
       // -----------------------------
       const applyHover = (card: HTMLElement) => {
         if (activeCard === card) return;
 
+        if (leaveTimeout) {
+          clearTimeout(leaveTimeout);
+          leaveTimeout = null;
+        }
+
+        const prev = activeCard;
         activeCard = card;
 
-        const siblings = cards.filter((c) => c !== card);
+        // reset previous only
+        if (prev) resetCard(prev);
 
-        const top = card.querySelector(".top");
-        const right = card.querySelector(".right");
-        const bottom = card.querySelector(".bottom");
-        const left = card.querySelector(".left");
+        // activate current
+        activateCard(card);
 
-        gsap.killTweensOf(cards);
-        resetAll();
-
-        gsap.to(card, {
-          scale: 1.03,
-          opacity: 1,
-          zIndex: 10,
-          duration: 0.2,
-        });
-
-        gsap.to(top, { left: 36, right: 36, duration: 0.25 });
-        gsap.to(bottom, { left: 36, right: 36, duration: 0.25 });
-        gsap.to(left, { top: 36, bottom: 36, duration: 0.25 });
-        gsap.to(right, { top: 36, bottom: 36, duration: 0.25 });
-
-        siblings.forEach((sib) => {
-          const sibTop = sib.querySelector(".top");
-          const sibRight = sib.querySelector(".right");
-          const sibBottom = sib.querySelector(".bottom");
-          const sibLeft = sib.querySelector(".left");
-
-          gsap.to(sib, {
-            opacity: 0.4,
-            scale: 0.98,
-            duration: 0.2,
-          });
-
-          gsap.to(sibTop, { left: 0, right: 0, duration: 0.25 });
-          gsap.to(sibRight, { top: 0, bottom: 0, duration: 0.25 });
-          gsap.to(sibBottom, { left: 0, right: 0, duration: 0.25 });
-          gsap.to(sibLeft, { top: 0, bottom: 0, duration: 0.25 });
+        // dim others
+        cards.forEach((c) => {
+          if (c !== card) dimCard(c);
         });
       };
 
@@ -144,22 +207,20 @@ export default function SkillsGrid({ skills }: { skills: Skill[] }) {
         scrollTrigger: {
           trigger: wrapper,
           start: "top 50%",
+          fastScrollEnd: true,
         },
         onComplete: () => {
           scrollComplete = true;
 
-          // 🔥 FIX: sync hover immediately after scroll
           requestAnimationFrame(() => {
             const el = document.elementFromPoint(
               mouseX,
               mouseY,
             ) as HTMLElement | null;
-
             const card = el?.closest?.(".card") as HTMLElement | null;
 
-            if (card) {
-              applyHover(card);
-            } else {
+            if (card) applyHover(card);
+            else {
               activeCard = null;
               resetAll();
             }
@@ -208,13 +269,20 @@ export default function SkillsGrid({ skills }: { skills: Skill[] }) {
       cards.forEach((card) => {
         const onEnter = () => {
           if (!scrollComplete) return;
+          if (leaveTimeout) {
+            clearTimeout(leaveTimeout);
+            leaveTimeout = null;
+          }
           applyHover(card);
         };
 
         const onLeave = () => {
           if (!scrollComplete) return;
-          activeCard = null;
-          resetAll();
+          if (leaveTimeout) return;
+          leaveTimeout = setTimeout(() => {
+            activeCard = null;
+            resetAll();
+          }, leaveTimer);
         };
 
         card.addEventListener("mouseenter", onEnter);
@@ -226,30 +294,52 @@ export default function SkillsGrid({ skills }: { skills: Skill[] }) {
         });
       });
 
+      let ticking = false;
+
       const syncHoverState = (e: MouseEvent) => {
         if (!scrollComplete) return;
 
-        const el = document.elementFromPoint(
-          e.clientX,
-          e.clientY,
-        ) as HTMLElement | null;
+        if (ticking) return;
+        ticking = true;
 
-        const card = el?.closest?.(".card") as HTMLElement | null;
+        requestAnimationFrame(() => {
+          const el = document.elementFromPoint(
+            e.clientX,
+            e.clientY,
+          ) as HTMLElement | null;
+          const card = el?.closest?.(".card") as HTMLElement | null;
 
-        if (!card) {
-          if (activeCard) {
-            activeCard = null;
-            resetAll();
+          if (!card) {
+            if (activeCard && !leaveTimeout) {
+              leaveTimeout = setTimeout(() => {
+                activeCard = null;
+                resetAll();
+                leaveTimeout = null;
+              }, leaveTimer);
+            }
+            return;
+          } else if (card !== activeCard) {
+            applyHover(card);
           }
-          return;
-        }
 
-        if (card !== activeCard) {
-          applyHover(card);
-        }
+          ticking = false;
+        });
+      };
+
+      const wrapperMouseLeave = () => {
+        if (leaveTimeout) clearTimeout(leaveTimeout);
+
+        if (leaveTimeout) return;
+
+        leaveTimeout = setTimeout(() => {
+          activeCard = null;
+          resetAll();
+          leaveTimeout = null;
+        }, leaveTimer);
       };
 
       wrapper?.addEventListener("mousemove", syncHoverState);
+      wrapper?.addEventListener("mouseleave", wrapperMouseLeave);
 
       // -----------------------------
       // CLEANUP
@@ -257,6 +347,7 @@ export default function SkillsGrid({ skills }: { skills: Skill[] }) {
       return () => {
         window.removeEventListener("mousemove", handleMouseMoveGlobal);
         wrapper?.removeEventListener("mousemove", syncHoverState);
+        wrapper?.removeEventListener("mouseleave", wrapperMouseLeave);
         cleanups.forEach((fn) => fn());
       };
     },
