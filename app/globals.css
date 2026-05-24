@@ -7,11 +7,32 @@
 }
 
 .container {
-  @apply px-4;
+  @apply px-4 mx-auto;
 }
 
 body {
   min-height: 100svh;
   font-size: calc(18rem / 16);
   font-family: var(--font-pixelOperator);
+}
+
+.project-card::before {
+  transform: scaleX(var(--scaleLeft, 0));
+  transform-origin: left;
+}
+
+.project-card::after {
+  transform: scaleX(var(--scaleRight, 0));
+  transform-origin: left;
+}
+
+.project-card .borders {
+  &::after,
+  &::before {
+    /* transform: scaleX(
+      calc((var(--scaleRight, 0) + var(--scaleLeft, 0)) / 1.25)
+    ); */
+    transform: scaleX(var(--scaleLeft, 0));
+    transform-origin: left;
+  }
 }

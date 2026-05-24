@@ -62,3 +62,28 @@ export const skills = [
   },
 ];
 export type Skill = (typeof skills)[number];
+
+export const projects = [
+  {
+    title: "Grace Support Services",
+    skills: ["Next.js", "Tailwind CSS"],
+    url: "https://gracesupportservices.com.au",
+    image: "https://placehold.co/600x400",
+    alt: "Grace ss",
+  },
+  {
+    title: "Aeroparts Solutions",
+    skills: ["Next.js", "Tailwind CSS", "GSAP"],
+    url: "https://aeroparts-solution.vercel.app/",
+    image: "https://placehold.co/600x401",
+    alt: "Aero ss",
+  },
+  {
+    title: "URL Shortener",
+    skills: ["Next.js", "Supabase", "OAuth"],
+    url: "https://url-shortener-kappa-six.vercel.app/",
+    image: "https://placehold.co/600x402",
+    alt: "Shortener ss",
+  },
+];
+export type Project = (typeof projects)[number];

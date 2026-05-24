@@ -1,6 +1,6 @@
 import { Skill } from "@/app/constants";
 import { headers } from "next/headers";
-import SkillsGrid from "./skillsGrid";
+import SkillsGrid from "./SkillsGrid";
 
 export default async function SkillSetPage() {
   const headersList = await headers();
@@ -11,7 +11,6 @@ export default async function SkillSetPage() {
   const skills: Skill[] = await fetch(`${baseUrl}/api/skills`).then((res) =>
     res.json(),
   );
-  console.log(skills);
 
   return (
     <div className="container mx-auto py-8 @container">
